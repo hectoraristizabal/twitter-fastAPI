@@ -1,6 +1,3 @@
-class UserBase(BaseModel):
-    user_id: UUID = Field(...)
-    email: EmailStr = Field(...)
 # Python
 from datetime import date, datetime
 from typing import Optional
@@ -9,6 +6,10 @@ from uuid import UUID
 # Pydantic
 from pydantic import BaseModel, EmailStr, Field
 
+class UserBase(BaseModel):
+    user_id: UUID = Field(...)
+    email: EmailStr = Field(...)
+    
 class UserLogin(UserBase):
     password: str = Field(
         ...,
