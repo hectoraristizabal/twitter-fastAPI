@@ -1,13 +1,16 @@
-# Models
 import json
 from unittest import result
+from uuid import UUID
+from typing import List
+
+# Models
 from models import User,UserBase,UserLogin,Tweet, UserRegister
 
 # FastAPI
-from fastapi import Body, FastAPI, status
+from fastapi import Body, FastAPI, status, HTTPException, Path
 
 # Pydantic
-from typing import List
+from pydantic import Field
 
 app = FastAPI()
 
@@ -52,7 +55,6 @@ def signup(user: UserRegister = Body(...)):
         return user
 
 
-
 ### Login a user
 @app.post(
     path="/loging",
@@ -92,7 +94,6 @@ def show_all_users():
         results = json.loads(f.read())
         return results
 
-
 ### Show a user
 @app.get(
     path="/users/{user_id}",
@@ -101,19 +102,44 @@ def show_all_users():
     summary="Show a User",
     tags=["Users"]
 )
-def show_a_user():
-    pass
+def show_a_user(user_id: UUID = Path(...)):
+    with open("users.json","r+",encoding="utf-8") as f:
+        results = json.loads(f.read())
+        id = str (user_id)
+        for data in results:
+            if data["user_id"] == id:
+                return data
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail = f'This user_id: {user_id} doesn´t exist!'
+                )
 
 ### Delete a user
 @app.delete(
     path="/users/{user_id}/delete",
     response_model=User,
-    status_code=status.HTTP_202_ACCEPTED,
+    status_code=status.HTTP_200_OK,
     summary="Deleted a User",
     tags=["Users"]
-)
-def delete_a_user():
-    pass
+)    
+def delete_a_user(user_id: UUID = Path(...)):
+    with open("users.json","r+",encoding="utf-8") as f:
+        results = json.loads(f.read())
+        id = str (user_id)
+        for data in results:
+            if data["user_id"]==id:
+                results.remove(data)
+
+                with open("users.json","w",encoding="utf-8") as f:
+                    f.seek(0)
+                    f.write(json.dumps(results))
+                    return data
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail = f'El id_user: {user_id} doesn´t exist!'
+                )
 
 ### Update a user
 @app.put(
@@ -123,9 +149,26 @@ def delete_a_user():
     summary="Update a User",
     tags=["Users"]
 )
-def update_a_user():
-    pass
+def update_a_user(user_id: UUID = Path(...),user: User = Body(...)):
+    id = str(user_id)
+    user_dict = user.dict()
+    user_dict["user_id"] = str(user_dict["user_id"])
+    user_dict["birth_date"] = str(user_dict["birth_date"])
 
+    with open("users.json","r+", encoding="utf-8") as f:
+        results = json.loads(f.read())
+    for user in results:
+        if user["user_id"] == id:
+            results[results.index(user)] =  user_dict
+            with open("users.json","w",encoding="utf-8") as f:
+                f.seek(0)
+                f.write(json.dumps(results))
+                return user
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail = "This user_id doesn´t exist!"
+            )
 ## Tweets
 
 ### Show all tweets
