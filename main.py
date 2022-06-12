@@ -1,16 +1,15 @@
 import json
-from unittest import result
 from uuid import UUID
 from typing import List
 
 # Models
-from models import User,UserBase,UserLogin,Tweet, UserRegister
+from models import User,Tweet, UserRegister,LoginOut
 
 # FastAPI
-from fastapi import Body, FastAPI, status, HTTPException, Path
+from fastapi import Body, FastAPI, status, HTTPException, Path, Form
 
 # Pydantic
-from pydantic import Field
+from pydantic import EmailStr
 
 app = FastAPI()
 
@@ -58,13 +57,19 @@ def signup(user: UserRegister = Body(...)):
 ### Login a user
 @app.post(
     path="/loging",
-    response_model=User,
+    response_model=LoginOut,
     status_code=status.HTTP_200_OK  ,
     summary="Login a User",
     tags=["Users"]
 )
-def login():
-    pass
+def Login(email: EmailStr  = Form(...), password: str = Form(...)):
+    with open("users.json", "r+", encoding="utf-8") as f: 
+        datos = json.loads(f.read())
+        for user in datos:
+            if email == user['email'] and password == user['password']:
+                return LoginOut(email=email)
+            else:
+                return LoginOut(email=email, message="Login Unsuccessfully!")
 
 ### Show all user
 @app.get(
@@ -149,26 +154,28 @@ def delete_a_user(user_id: UUID = Path(...)):
     summary="Update a User",
     tags=["Users"]
 )
-def update_a_user(user_id: UUID = Path(...),user: User = Body(...)):
-    id = str(user_id)
+def update_a_user(user_id: UUID = Path(...),user: UserRegister = Body(...)):
+    user_id = str(user_id)
     user_dict = user.dict()
     user_dict["user_id"] = str(user_dict["user_id"])
     user_dict["birth_date"] = str(user_dict["birth_date"])
-
-    with open("users.json","r+", encoding="utf-8") as f:
+    with open("users.json", "r+", encoding="utf-8") as f: 
         results = json.loads(f.read())
     for user in results:
-        if user["user_id"] == id:
-            results[results.index(user)] =  user_dict
-            with open("users.json","w",encoding="utf-8") as f:
+        if user["user_id"] == user_id:
+            results[results.index(user)] = user_dict
+            with open("users.json", "w", encoding="utf-8") as f:
                 f.seek(0)
                 f.write(json.dumps(results))
-                return user
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail = "This user_id doesn´t exist!"
-            )
+            return user
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="¡This user_id doesn't exist!"
+        )
+
+
+
 ## Tweets
 
 ### Show all tweets

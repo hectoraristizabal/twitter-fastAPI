@@ -1,16 +1,1 @@
-[
-    {
-        "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
-        "email": "hector@gmail.com",
-        "first_name": "hector",
-        "last_name": "aristizabal",
-        "birth_date": "2022-06-12"
-    },
-    {
-        "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa1",
-        "email": "rocio@gmail.com",
-        "first_name": "rocio",
-        "last_name": "gomez",
-        "birth_date": "2022-06-12"
-    }
-]
+[{"user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "email": "hector@gmail.com", "password": "hector123", "first_name": "hector ivan", "last_name": "aristizabal", "birth_date": "2022-06-12"}, {"user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "email": "rocio@hotmail.com", "password": "andar123", "first_name": "rocio", "last_name": "aristizabal", "birth_date": "2022-06-12"}, {"user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa9", "email": "facundo@gmail.com", "password": "facundo123", "first_name": "facundo", "last_name": "lopez", "birth_date": "2022-06-12"}]
